@@ -1,5 +1,6 @@
 import { CartItem, Coupon } from '../../../types'
 import { CartBox } from './CartBox'
+import { CouponApplyBox } from './CouponApplyBox'
 
 interface Props {
   coupons: Coupon[]
@@ -57,32 +58,7 @@ export const CartDetail = ({
         })}
       </div>
 
-      <div className="mt-6 rounded bg-white p-4 shadow">
-        <h2 className="mb-2 text-2xl font-semibold">쿠폰 적용</h2>
-        <select
-          onChange={(e) => applyCoupon(coupons[parseInt(e.target.value)])}
-          className="mb-2 w-full rounded border p-2"
-        >
-          <option value="">쿠폰 선택</option>
-          {coupons.map((coupon, index) => (
-            <option key={coupon.code} value={index}>
-              {coupon.name} -{' '}
-              {coupon.discountType === 'amount'
-                ? `${coupon.discountValue}원`
-                : `${coupon.discountValue}%`}
-            </option>
-          ))}
-        </select>
-        {selectedCoupon && (
-          <p className="text-green-600">
-            적용된 쿠폰: {selectedCoupon.name}(
-            {selectedCoupon.discountType === 'amount'
-              ? `${selectedCoupon.discountValue}원`
-              : `${selectedCoupon.discountValue}%`}{' '}
-            할인)
-          </p>
-        )}
-      </div>
+      <CouponApplyBox coupons={coupons} selectedCoupon={selectedCoupon} applyCoupon={applyCoupon} />
 
       <div className="mt-6 rounded bg-white p-4 shadow">
         <h2 className="mb-2 text-2xl font-semibold">주문 요약</h2>
