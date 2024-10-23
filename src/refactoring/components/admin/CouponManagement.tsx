@@ -1,5 +1,5 @@
 import { Coupon } from '../../../types'
-import { CouponListBox } from './CouponListBox'
+import { CouponList } from './CouponList'
 import { CreateCouponFormBox } from './CreateCouponFormBox'
 
 interface Props {
@@ -19,7 +19,7 @@ export const CouponManagement = ({ newCoupon, setNewCoupon, handleAddCoupon, cou
           setNewCoupon={setNewCoupon}
           handleAddCoupon={handleAddCoupon}
         />
-        <CouponListBox coupons={coupons} />
+        <CouponList coupons={coupons} />
       </div>
     </div>
   )

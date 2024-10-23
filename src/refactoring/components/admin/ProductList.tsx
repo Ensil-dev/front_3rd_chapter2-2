@@ -16,7 +16,7 @@ interface Props {
   handleRemoveDiscount: (productId: string, index: number) => void
 }
 
-export const ProductListBox = ({
+export const ProductList = ({
   products,
   openProductIds,
   editingProduct,

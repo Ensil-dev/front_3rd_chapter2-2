@@ -4,7 +4,7 @@ interface Props {
   coupons: Coupon[]
 }
 
-export const CouponListBox = ({ coupons }: Props) => {
+export const CouponList = ({ coupons }: Props) => {
   return (
     <div>
       <h3 className="mb-2 text-lg font-semibold">현재 쿠폰 목록</h3>

@@ -1,6 +1,6 @@
 import { Discount, Product } from '../../../types'
 import { CreateProductFormBox } from './CreateProductFormBox'
-import { ProductListBox } from './ProductListBox'
+import { ProductList } from './ProductList'
 
 interface Props {
   products: Product[]
@@ -62,7 +62,7 @@ export const ProductManagement = ({
         />
       )}
 
-      <ProductListBox
+      <ProductList
         products={products}
         openProductIds={openProductIds}
         editingProduct={editingProduct}
