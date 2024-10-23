@@ -37,7 +37,7 @@ export const ProductList = ({
       {products.map((product, index) => (
         <ProductBox
           key={product.id}
-          data-testid={`product-${index + 1}`}
+          index={index}
           product={product}
           openProductIds={openProductIds}
           editingProduct={editingProduct}

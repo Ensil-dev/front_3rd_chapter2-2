@@ -5,6 +5,7 @@ interface Props {
   openProductIds: Set<string>
   editingProduct: Product | null
   newDiscount: Discount
+  index: number
   setNewDiscount: (discount: Discount) => void
   toggleProductAccordion: (productId: string) => void
   handleProductNameUpdate: (productId: string, newName: string) => void
@@ -21,6 +22,7 @@ export const ProductBox = ({
   openProductIds,
   editingProduct,
   newDiscount,
+  index,
   setNewDiscount,
   toggleProductAccordion,
   handleProductNameUpdate,
@@ -32,7 +34,7 @@ export const ProductBox = ({
   handleRemoveDiscount,
 }: Props) => {
   return (
-    <div className="rounded bg-white p-4 shadow">
+    <div data-testid={`product-${index + 1}`} className="rounded bg-white p-4 shadow">
       <button
         data-testid="toggle-button"
         onClick={() => toggleProductAccordion(product.id)}
