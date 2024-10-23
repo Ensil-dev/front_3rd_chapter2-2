@@ -1,6 +1,7 @@
 import { CartItem, Coupon } from '../../../types'
 import { CartBox } from './CartBox'
 import { CouponApplyBox } from './CouponApplyBox'
+import { OrderSummaryBox } from './OrderSummaryBox'
 
 interface Props {
   coupons: Coupon[]
@@ -60,16 +61,11 @@ export const CartDetail = ({
 
       <CouponApplyBox coupons={coupons} selectedCoupon={selectedCoupon} applyCoupon={applyCoupon} />
 
-      <div className="mt-6 rounded bg-white p-4 shadow">
-        <h2 className="mb-2 text-2xl font-semibold">주문 요약</h2>
-        <div className="space-y-1">
-          <p>상품 금액: {totalBeforeDiscount.toLocaleString()}원</p>
-          <p className="text-green-600">할인 금액: {totalDiscount.toLocaleString()}원</p>
-          <p className="text-xl font-bold">
-            최종 결제 금액: {totalAfterDiscount.toLocaleString()}원
-          </p>
-        </div>
-      </div>
+      <OrderSummaryBox
+        totalBeforeDiscount={totalBeforeDiscount}
+        totalDiscount={totalDiscount}
+        totalAfterDiscount={totalAfterDiscount}
+      />
     </div>
   )
 }
