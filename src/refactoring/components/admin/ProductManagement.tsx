@@ -8,7 +8,7 @@ interface Props {
   editingProduct: Product | null
   newDiscount: Discount
   setNewProduct: (product: Product) => void
-  setNewDiscount: React.Dispatch<React.SetStateAction<Discount>>
+  setNewDiscount: (discount: Discount) => void
   onToggleNewProductForm: (showNewProductForm: boolean) => void
   toggleProductAccordion: (productId: string) => void
 
@@ -110,7 +110,7 @@ export const ProductManagement = ({
             />
           </div>
           <button
-            onClick={() => handleAddNewProduct}
+            onClick={() => handleAddNewProduct(newProduct as Product)}
             className="w-full rounded bg-blue-500 p-2 text-white hover:bg-blue-600"
           >
             추가
