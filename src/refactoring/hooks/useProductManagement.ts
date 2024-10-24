@@ -1,11 +1,22 @@
 import { useCallback, useState } from 'react'
 import { Discount, Product } from '../../types'
-import { INITIAL_DISCOUNT_STATE } from '../constants/admin'
-import { findProductById, validateDiscount } from './utils/adminUtils'
+import { INITIAL_DISCOUNT_STATE, INITIAL_PRODUCT_STATE } from '../constants/admin'
+import { findProductById, validateDiscount, toggleSetItem } from './utils/adminUtils'
 
-export const useProductManagement = (onProductUpdate: (product: Product) => void) => {
+interface UseProductManagementProps {
+  onProductUpdate: (product: Product) => void
+  onProductAdd: (product: Product) => void
+}
+
+export const useProductManagement = ({
+  onProductUpdate,
+  onProductAdd,
+}: UseProductManagementProps) => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [newDiscount, setNewDiscount] = useState<Discount>(INITIAL_DISCOUNT_STATE)
+  const [openProductIds, setOpenProductIds] = useState<Set<string>>(new Set())
+  const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>(INITIAL_PRODUCT_STATE)
+  const [showNewProductForm, setShowNewProductForm] = useState(false)
 
   const handleEditProduct = useCallback((product: Product) => {
     setEditingProduct({ ...product })
@@ -67,7 +78,7 @@ export const useProductManagement = (onProductUpdate: (product: Product) => void
         }
         onProductUpdate(newProduct)
         setEditingProduct(newProduct)
-        setNewDiscount({ quantity: 0, rate: 0 })
+        setNewDiscount(INITIAL_DISCOUNT_STATE)
       }
     },
     [editingProduct, newDiscount, onProductUpdate],
@@ -88,11 +99,35 @@ export const useProductManagement = (onProductUpdate: (product: Product) => void
     [onProductUpdate],
   )
 
+  const handleAddNewProduct = useCallback(
+    (product: Omit<Product, 'id'>) => {
+      const productWithId = { ...product, id: Date.now().toString() }
+      onProductAdd(productWithId)
+      setNewProduct(INITIAL_PRODUCT_STATE)
+      setShowNewProductForm(false)
+    },
+    [onProductAdd],
+  )
+
+  const toggleProductAccordion = useCallback((productId: string) => {
+    setOpenProductIds((prev) => toggleSetItem(prev, productId))
+  }, [])
+
   return {
+    // 상태
     editingProduct,
     newDiscount,
+    openProductIds,
+    newProduct,
+    showNewProductForm,
+
+    // 상태 설정 함수
     setEditingProduct,
     setNewDiscount,
+    setNewProduct,
+    setShowNewProductForm,
+
+    // 핸들러 함수들
     handleEditProduct,
     handleProductNameUpdate,
     handleEditComplete,
@@ -100,5 +135,7 @@ export const useProductManagement = (onProductUpdate: (product: Product) => void
     handleStockUpdate,
     handleAddDiscount,
     handleRemoveDiscount,
+    handleAddNewProduct,
+    toggleProductAccordion,
   }
 }

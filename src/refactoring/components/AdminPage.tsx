@@ -1,9 +1,6 @@
-import { useCallback, useState } from 'react'
 import { Coupon, Product } from '../../types.ts'
 import { ProductManagement } from './admin/ProductManagement.tsx'
 import { CouponManagement } from './admin/CouponManagement.tsx'
-import { INITIAL_PRODUCT_STATE } from '../constants/admin'
-import { toggleSetItem } from '../hooks/utils/adminUtils.ts'
 import { useProductManagement } from '../hooks/useProductManagement.ts'
 import { useCouponManagement } from '../hooks/useCouponManagement.ts'
 
@@ -22,13 +19,14 @@ export const AdminPage = ({
   onProductAdd,
   onCouponAdd,
 }: Props) => {
-  const [openProductIds, setOpenProductIds] = useState<Set<string>>(new Set())
-  const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>(INITIAL_PRODUCT_STATE)
-  const [showNewProductForm, setShowNewProductForm] = useState(false)
-
   const {
     editingProduct,
     newDiscount,
+    openProductIds,
+    newProduct,
+    showNewProductForm,
+    setNewProduct,
+    setShowNewProductForm,
     setNewDiscount,
     handleEditProduct,
     handleProductNameUpdate,
@@ -37,23 +35,11 @@ export const AdminPage = ({
     handleStockUpdate,
     handleAddDiscount,
     handleRemoveDiscount,
-  } = useProductManagement(onProductUpdate)
+    handleAddNewProduct,
+    toggleProductAccordion,
+  } = useProductManagement({ onProductUpdate, onProductAdd })
 
   const { newCoupon, setNewCoupon, handleAddCoupon } = useCouponManagement(onCouponAdd)
-
-  const toggleProductAccordion = useCallback((productId: string) => {
-    setOpenProductIds((prev) => toggleSetItem(prev, productId))
-  }, [])
-
-  const handleAddNewProduct = useCallback(
-    (newProduct: Product) => {
-      const productWithId = { ...newProduct, id: Date.now().toString() }
-      onProductAdd(productWithId)
-      setNewProduct(INITIAL_PRODUCT_STATE)
-      setShowNewProductForm(false)
-    },
-    [onProductAdd],
-  )
 
   return (
     <div className="container mx-auto p-4">
