@@ -12,7 +12,8 @@ import {
   validateDiscount,
 } from '../../refactoring/hooks/utils/adminUtils'
 import { useCouponManagement } from '../../refactoring/hooks/useCouponManagement'
-import { INITIAL_COUPON_STATE } from '../../refactoring/constants/admin'
+import { INITIAL_COUPON_STATE, INITIAL_PRODUCT_STATE } from '../../refactoring/constants/admin'
+import { useProductManagement } from '../../refactoring/hooks/useProductManagement'
 
 const mockProducts: Product[] = [
   {
@@ -309,7 +310,6 @@ describe('advanced > ', () => {
     })
 
     describe('useCouponManagement >', () => {
-      
       test('초기 상태는 INITIAL_COUPON_STATE와 같아야 합니다', () => {
         const onCouponAdd = vi.fn()
         const { result } = renderHook(() => useCouponManagement(onCouponAdd))
@@ -407,6 +407,176 @@ describe('advanced > ', () => {
         })
 
         expect(result.current.newCoupon).toEqual(INITIAL_COUPON_STATE)
+      })
+    })
+
+    describe('useProductManagement >', () => {
+      // 목 데이터 및 핸들러
+      const mockProduct = {
+        id: 'p1',
+        name: '상품1',
+        price: 10000,
+        stock: 20,
+        discounts: [{ quantity: 10, rate: 0.1 }],
+      }
+
+      const mockOnProductUpdate = vi.fn()
+      const mockOnProductAdd = vi.fn()
+
+      beforeEach(() => {
+        vi.clearAllMocks()
+      })
+
+      test('상품 수정 모드를 토글할 수 있어야 합니다', () => {
+        const { result } = renderHook(() =>
+          useProductManagement({
+            onProductUpdate: mockOnProductUpdate,
+            onProductAdd: mockOnProductAdd,
+          }),
+        )
+
+        // 초기값 확인
+        expect(result.current.editingProduct).toBeNull()
+
+        // 수정 모드 진입
+        act(() => {
+          result.current.handleEditProduct(mockProduct)
+        })
+
+        // 수정 중인 상품 확인
+        expect(result.current.editingProduct).toEqual(mockProduct)
+      })
+
+      test('상품 아코디언을 토글할 수 있어야 합니다', () => {
+        const { result } = renderHook(() =>
+          useProductManagement({
+            onProductUpdate: mockOnProductUpdate,
+            onProductAdd: mockOnProductAdd,
+          }),
+        )
+
+        // 초기값 확인 (닫힌 상태)
+        expect(result.current.openProductIds.has('p1')).toBe(false)
+
+        // 아코디언 열기
+        act(() => {
+          result.current.toggleProductAccordion('p1')
+        })
+
+        // 열린 상태 확인
+        expect(result.current.openProductIds.has('p1')).toBe(true)
+
+        // 아코디언 닫기
+        act(() => {
+          result.current.toggleProductAccordion('p1')
+        })
+
+        // 닫힌 상태 확인
+        expect(result.current.openProductIds.has('p1')).toBe(false)
+      })
+
+      test('상품 정보를 업데이트할 수 있어야 합니다', () => {
+        const { result } = renderHook(() =>
+          useProductManagement({
+            onProductUpdate: mockOnProductUpdate,
+            onProductAdd: mockOnProductAdd,
+          }),
+        )
+
+        // 수정 모드 진입
+        act(() => {
+          result.current.handleEditProduct(mockProduct)
+        })
+
+        // 상품명 수정
+        act(() => {
+          result.current.handleProductNameUpdate('p1', '수정된 상품1')
+        })
+
+        expect(result.current.editingProduct?.name).toBe('수정된 상품1')
+
+        // 수정 완료
+        act(() => {
+          result.current.handleEditComplete()
+        })
+
+        // onProductUpdate가 호출되었는지 확인
+        expect(mockOnProductUpdate).toHaveBeenCalledTimes(1)
+        expect(mockOnProductUpdate).toHaveBeenCalledWith({
+          ...mockProduct,
+          name: '수정된 상품1',
+        })
+      })
+
+      test('할인 정보를 추가/제거할 수 있어야 합니다', () => {
+        const { result } = renderHook(() =>
+          useProductManagement({
+            onProductUpdate: mockOnProductUpdate,
+            onProductAdd: mockOnProductAdd,
+          }),
+        )
+
+        const products = [mockProduct]
+        const newDiscount = { quantity: 5, rate: 0.05 }
+
+        // 수정 모드 진입
+        act(() => {
+          result.current.handleEditProduct(mockProduct)
+          result.current.setNewDiscount(newDiscount)
+        })
+
+        // 할인 추가
+        act(() => {
+          result.current.handleAddDiscount('p1', products)
+        })
+
+        // 할인이 추가되었는지 확인
+        expect(mockOnProductUpdate).toHaveBeenCalledWith({
+          ...mockProduct,
+          discounts: [...mockProduct.discounts, newDiscount],
+        })
+
+        // 할인 제거
+        act(() => {
+          result.current.handleRemoveDiscount('p1', 0, products)
+        })
+
+        // 할인이 제거되었는지 확인
+        expect(mockOnProductUpdate).toHaveBeenCalledWith({
+          ...mockProduct,
+          discounts: [],
+        })
+      })
+
+      test('새 상품을 추가할 수 있어야 합니다', () => {
+        const { result } = renderHook(() =>
+          useProductManagement({
+            onProductUpdate: mockOnProductUpdate,
+            onProductAdd: mockOnProductAdd,
+          }),
+        )
+
+        const newProduct = {
+          name: '새 상품',
+          price: 15000,
+          stock: 30,
+          discounts: [],
+        }
+
+        act(() => {
+          result.current.handleAddNewProduct(newProduct)
+        })
+
+        // onProductAdd가 호출되었는지 확인
+        expect(mockOnProductAdd).toHaveBeenCalledTimes(1)
+        expect(mockOnProductAdd).toHaveBeenCalledWith({
+          ...newProduct,
+          id: expect.any(String),
+        })
+
+        // 상태가 초기화되었는지 확인
+        expect(result.current.newProduct).toEqual(INITIAL_PRODUCT_STATE)
+        expect(result.current.showNewProductForm).toBe(false)
       })
     })
   })
