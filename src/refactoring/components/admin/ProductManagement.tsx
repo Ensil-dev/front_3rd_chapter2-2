@@ -17,12 +17,12 @@ interface Props {
   handleProductNameUpdate: (productId: string, newName: string) => void
   handleAddNewProduct: (newProduct: Product) => void
   handlePriceUpdate: (productId: string, newPrice: number) => void
-  handleStockUpdate: (productId: string, newStock: number) => void
+  handleStockUpdate: (productId: string, newStock: number, products: Product[]) => void
 
-  handleAddDiscount: (productId: string) => void
   handleEditComplete: () => void
   handleEditProduct: (product: Product) => void
-  handleRemoveDiscount: (productId: string, index: number) => void
+  handleAddDiscount: (productId: string, products: Product[]) => void
+  handleRemoveDiscount: (productId: string, index: number, products: Product[]) => void
 }
 
 export const ProductManagement = ({
@@ -72,9 +72,9 @@ export const ProductManagement = ({
         handleProductNameUpdate={handleProductNameUpdate}
         handlePriceUpdate={handlePriceUpdate}
         handleStockUpdate={handleStockUpdate}
-        handleAddDiscount={handleAddDiscount}
         handleEditComplete={handleEditComplete}
         handleEditProduct={handleEditProduct}
+        handleAddDiscount={handleAddDiscount}
         handleRemoveDiscount={handleRemoveDiscount}
       />
     </div>

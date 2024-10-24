@@ -2,6 +2,7 @@ import { Discount, Product } from '../../../types'
 
 interface Props {
   product: Product
+  products: Product[]
   openProductIds: Set<string>
   editingProduct: Product | null
   newDiscount: Discount
@@ -10,15 +11,16 @@ interface Props {
   toggleProductAccordion: (productId: string) => void
   handleProductNameUpdate: (productId: string, newName: string) => void
   handlePriceUpdate: (productId: string, newPrice: number) => void
-  handleStockUpdate: (productId: string, newStock: number) => void
-  handleAddDiscount: (productId: string) => void
+  handleStockUpdate: (productId: string, newStock: number, products: Product[]) => void
   handleEditComplete: () => void
   handleEditProduct: (product: Product) => void
-  handleRemoveDiscount: (productId: string, index: number) => void
+  handleAddDiscount: (productId: string, products: Product[]) => void
+  handleRemoveDiscount: (productId: string, index: number, products: Product[]) => void
 }
 
 export const ProductBox = ({
   product,
+  products,
   openProductIds,
   editingProduct,
   newDiscount,
@@ -28,9 +30,9 @@ export const ProductBox = ({
   handleProductNameUpdate,
   handlePriceUpdate,
   handleStockUpdate,
-  handleAddDiscount,
   handleEditComplete,
   handleEditProduct,
+  handleAddDiscount,
   handleRemoveDiscount,
 }: Props) => {
   return (
@@ -69,7 +71,9 @@ export const ProductBox = ({
                 <input
                   type="number"
                   value={editingProduct.stock}
-                  onChange={(e) => handleStockUpdate(product.id, parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handleStockUpdate(product.id, parseInt(e.target.value), products)
+                  }
                   className="w-full rounded border p-2"
                 />
               </div>
@@ -82,7 +86,7 @@ export const ProductBox = ({
                       {discount.quantity}개 이상 구매 시 {discount.rate * 100}% 할인
                     </span>
                     <button
-                      onClick={() => handleRemoveDiscount(product.id, index)}
+                      onClick={() => handleRemoveDiscount(product.id, index, products)}
                       className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
                     >
                       삭제
@@ -109,7 +113,7 @@ export const ProductBox = ({
                     className="w-1/3 rounded border p-2"
                   />
                   <button
-                    onClick={() => handleAddDiscount(product.id)}
+                    onClick={() => handleAddDiscount(product.id, products)}
                     className="w-1/3 rounded bg-blue-500 p-2 text-white hover:bg-blue-600"
                   >
                     할인 추가

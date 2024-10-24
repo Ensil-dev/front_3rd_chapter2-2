@@ -1,13 +1,10 @@
-import { useState } from 'react'
-import { Coupon, Discount, Product } from '../../types.ts'
+import { useCallback, useState } from 'react'
+import { Coupon, Product } from '../../types.ts'
 import { ProductManagement } from './admin/ProductManagement.tsx'
 import { CouponManagement } from './admin/CouponManagement.tsx'
-import {
-  INITIAL_PRODUCT_STATE,
-  INITIAL_COUPON_STATE,
-  INITIAL_DISCOUNT_STATE,
-} from '../constants/admin'
-import { findProductById, toggleSetItem, validateDiscount } from '../hooks/utils/adminUtils.ts'
+import { INITIAL_PRODUCT_STATE, INITIAL_COUPON_STATE } from '../constants/admin'
+import { toggleSetItem } from '../hooks/utils/adminUtils.ts'
+import { useProductManagement } from '../hooks/useProductManagement.ts'
 
 interface Props {
   products: Product[]
@@ -25,84 +22,22 @@ export const AdminPage = ({
   onCouponAdd,
 }: Props) => {
   const [openProductIds, setOpenProductIds] = useState<Set<string>>(new Set())
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-  const [newDiscount, setNewDiscount] = useState<Discount>(INITIAL_DISCOUNT_STATE)
   const [newCoupon, setNewCoupon] = useState<Coupon>(INITIAL_COUPON_STATE)
   const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>(INITIAL_PRODUCT_STATE)
   const [showNewProductForm, setShowNewProductForm] = useState(false)
 
-  const toggleProductAccordion = (productId: string) => {
-    setOpenProductIds((prev) => toggleSetItem(prev, productId))
-  }
-
-  // handleEditProduct 함수 수정
-  const handleEditProduct = (product: Product) => {
-    setEditingProduct({ ...product })
-  }
-
-  // 새로운 핸들러 함수 추가
-  const handleProductNameUpdate = (productId: string, newName: string) => {
-    if (editingProduct && editingProduct.id === productId) {
-      const updatedProduct = { ...editingProduct, name: newName }
-      setEditingProduct(updatedProduct)
-    }
-  }
-
-  // 새로운 핸들러 함수 추가
-  const handlePriceUpdate = (productId: string, newPrice: number) => {
-    if (editingProduct && editingProduct.id === productId) {
-      const updatedProduct = { ...editingProduct, price: newPrice }
-      setEditingProduct(updatedProduct)
-    }
-  }
-
-  // 수정 완료 핸들러 함수 추가
-  const handleEditComplete = () => {
-    if (editingProduct) {
-      onProductUpdate(editingProduct)
-      setEditingProduct(null)
-    }
-  }
-
-  const handleStockUpdate = (productId: string, newStock: number) => {
-    const updatedProduct = findProductById(products, productId)
-    if (updatedProduct) {
-      const newProduct = { ...updatedProduct, stock: newStock }
-      onProductUpdate(newProduct)
-      setEditingProduct(newProduct)
-    }
-  }
-
-  const handleAddDiscount = (productId: string) => {
-    const updatedProduct = products.find((p) => p.id === productId)
-    if (updatedProduct && editingProduct) {
-      // 👉 여기에 validateDiscount 추가
-      if (!validateDiscount(newDiscount)) {
-        alert('유효하지 않은 할인 정보입니다.')
-        return
-      }
-
-      const newProduct = {
-        ...updatedProduct,
-        discounts: [...updatedProduct.discounts, newDiscount],
-      }
-      onProductUpdate(newProduct)
-      setEditingProduct(newProduct)
-      setNewDiscount({ quantity: 0, rate: 0 })
-    }
-  }
-
-  const handleRemoveDiscount = (productId: string, index: number) => {
-    const updatedProduct = findProductById(products, productId)
-    if (updatedProduct) {
-      const newProduct = {
-        ...updatedProduct,
-        discounts: updatedProduct.discounts.filter((_, i) => i !== index),
-      }
-      onProductUpdate(newProduct)
-      setEditingProduct(newProduct)
-    }
-  }
+  const {
+    editingProduct,
+    newDiscount,
+    setNewDiscount,
+    handleEditProduct,
+    handleProductNameUpdate,
+    handleEditComplete,
+    handlePriceUpdate,
+    handleStockUpdate,
+    handleAddDiscount,
+    handleRemoveDiscount,
+  } = useProductManagement(onProductUpdate)
 
   const handleAddCoupon = () => {
     onCouponAdd(newCoupon)
@@ -114,17 +49,19 @@ export const AdminPage = ({
     })
   }
 
-  const handleAddNewProduct = (newProduct: Product) => {
-    const productWithId = { ...newProduct, id: Date.now().toString() }
-    onProductAdd(productWithId)
-    setNewProduct({
-      name: '',
-      price: 0,
-      stock: 0,
-      discounts: [],
-    })
-    setShowNewProductForm(false)
-  }
+  const toggleProductAccordion = useCallback((productId: string) => {
+    setOpenProductIds((prev) => toggleSetItem(prev, productId))
+  }, [])
+
+  const handleAddNewProduct = useCallback(
+    (newProduct: Product) => {
+      const productWithId = { ...newProduct, id: Date.now().toString() }
+      onProductAdd(productWithId)
+      setNewProduct(INITIAL_PRODUCT_STATE)
+      setShowNewProductForm(false)
+    },
+    [onProductAdd],
+  )
 
   return (
     <div className="container mx-auto p-4">
@@ -145,9 +82,9 @@ export const AdminPage = ({
           handleAddNewProduct={handleAddNewProduct}
           handlePriceUpdate={handlePriceUpdate}
           handleStockUpdate={handleStockUpdate}
-          handleAddDiscount={handleAddDiscount}
           handleEditComplete={handleEditComplete}
           handleEditProduct={handleEditProduct}
+          handleAddDiscount={handleAddDiscount}
           handleRemoveDiscount={handleRemoveDiscount}
         />
 
