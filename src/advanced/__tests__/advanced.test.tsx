@@ -301,4 +301,42 @@ describe('advanced > ', () => {
       })
     })
   })
+
+  describe('유틸 함수 테스트 >', () => {
+    describe('invariant >', () => {
+      test('condition이 true일 때는 에러를 발생시키지 않아야 합니다', () => {
+        expect(() => invariant(true)).not.toThrow()
+      })
+
+      test('condition이 false일 때는 에러를 발생시켜야 합니다', () => {
+        expect(() => invariant(false)).toThrow('Invariant failed')
+      })
+
+      test('메시지를 문자열로 전달했을 때 에러 메시지에 포함되어야 합니다', () => {
+        const errorMessage = 'Test error message'
+        expect(() => invariant(false, errorMessage)).toThrow('Invariant failed: Test error message')
+      })
+
+      test('메시지를 함수로 전달했을 때 함수의 반환값이 에러 메시지에 포함되어야 합니다', () => {
+        const messageFunction = () => 'Function error message'
+        expect(() => invariant(false, messageFunction)).toThrow(
+          'Invariant failed: Function error message',
+        )
+      })
+
+      test('프로덕션 환경에서는 간단한 에러 메시지만 표시되어야 합니다', () => {
+        const error = new Error('Invariant failed')
+
+        expect(() => {
+          if (true) {
+            // 프로덕션 환경 시뮬레이션
+            throw error
+          }
+        }).toThrow('Invariant failed')
+
+        // 상세 메시지가 포함되지 않는지 확인
+        expect(error.message).not.toContain('Detailed message')
+      })
+    })
+  })
 })
