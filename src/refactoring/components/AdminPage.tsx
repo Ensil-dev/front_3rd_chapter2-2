@@ -2,6 +2,11 @@ import { useState } from 'react'
 import { Coupon, Discount, Product } from '../../types.ts'
 import { ProductManagement } from './admin/ProductManagement.tsx'
 import { CouponManagement } from './admin/CouponManagement.tsx'
+import {
+  INITIAL_PRODUCT_STATE,
+  INITIAL_COUPON_STATE,
+  INITIAL_DISCOUNT_STATE,
+} from '../constants/admin'
 
 interface Props {
   products: Product[]
@@ -20,20 +25,10 @@ export const AdminPage = ({
 }: Props) => {
   const [openProductIds, setOpenProductIds] = useState<Set<string>>(new Set())
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-  const [newDiscount, setNewDiscount] = useState<Discount>({ quantity: 0, rate: 0 })
-  const [newCoupon, setNewCoupon] = useState<Coupon>({
-    name: '',
-    code: '',
-    discountType: 'percentage',
-    discountValue: 0,
-  })
+  const [newDiscount, setNewDiscount] = useState<Discount>(INITIAL_DISCOUNT_STATE)
+  const [newCoupon, setNewCoupon] = useState<Coupon>(INITIAL_COUPON_STATE)
+  const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>(INITIAL_PRODUCT_STATE)
   const [showNewProductForm, setShowNewProductForm] = useState(false)
-  const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
-    name: '',
-    price: 0,
-    stock: 0,
-    discounts: [],
-  })
 
   const toggleProductAccordion = (productId: string) => {
     setOpenProductIds((prev) => {
