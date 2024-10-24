@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { Coupon, Product } from '../../types.ts'
 import { useCart } from '../hooks'
+import invariant from '../hooks/utils/invariant.ts'
 import { CartDetail } from './carts/CartDetail.tsx'
 import { ProductList } from './carts/ProductList.tsx'
 
@@ -18,6 +20,10 @@ export const CartPage = ({ products, coupons }: Props) => {
     applyCoupon,
     selectedCoupon,
   } = useCart()
+
+  useEffect(() => {
+    invariant(cart.length !== products.length + 1, '장바구니는 상품 갯수를 초과할 수 없습니다.')
+  }, [cart.length, products.length])
 
   return (
     <div className="container mx-auto p-4">
