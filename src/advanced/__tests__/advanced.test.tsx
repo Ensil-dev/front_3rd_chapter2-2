@@ -3,9 +3,14 @@ import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest'
 import { act, fireEvent, render, renderHook, screen, within } from '@testing-library/react'
 import { CartPage } from '../../refactoring/components/CartPage'
 import { AdminPage } from '../../refactoring/components/AdminPage'
-import { Coupon, Product } from '../../types'
+import { Coupon, Discount, Product } from '../../types'
 import { useLocalStorage } from '../../refactoring/hooks'
 import invariant from '../../refactoring/hooks/utils/invariant'
+import {
+  findProductById,
+  toggleSetItem,
+  validateDiscount,
+} from '../../refactoring/hooks/utils/adminUtils'
 
 const mockProducts: Product[] = [
   {
@@ -336,6 +341,100 @@ describe('advanced > ', () => {
 
         // 상세 메시지가 포함되지 않는지 확인
         expect(error.message).not.toContain('Detailed message')
+      })
+    })
+
+    describe('validateDiscount >', () => {
+      test('유효한 할인 정보를 검증해야 합니다', () => {
+        const validDiscount = mockProducts[0].discounts[0]
+        expect(validDiscount).toEqual({ quantity: 10, rate: 0.1 })
+        expect(validateDiscount(validDiscount)).toBe(true)
+      })
+
+      test('수량이 0 이하면 false를 반환해야 합니다', () => {
+        const invalidDiscount: Discount = {
+          ...mockProducts[0].discounts[0],
+          quantity: 0,
+        }
+        expect(validateDiscount(invalidDiscount)).toBe(false)
+      })
+
+      test('할인율이 0 이하면 false를 반환해야 합니다', () => {
+        const invalidDiscount: Discount = {
+          ...mockProducts[0].discounts[0],
+          rate: 0,
+        }
+        expect(validateDiscount(invalidDiscount)).toBe(false)
+      })
+
+      test('할인율이 1 초과면 false를 반환해야 합니다', () => {
+        const invalidDiscount: Discount = {
+          ...mockProducts[0].discounts[0],
+          rate: 1.1,
+        }
+        expect(validateDiscount(invalidDiscount)).toBe(false)
+      })
+    })
+
+    describe('findProductById >', () => {
+      test('존재하는 상품 ID로 상품을 찾아야 합니다', () => {
+        const product = findProductById(mockProducts, 'p1')
+        expect(product).toBeDefined()
+        expect(product?.name).toBe('상품1')
+        expect(product?.price).toBe(10000)
+      })
+
+      test('존재하지 않는 상품 ID는 undefined를 반환해야 합니다', () => {
+        const product = findProductById(mockProducts, 'nonexistent')
+        expect(product).toBeUndefined()
+      })
+
+      test('빈 배열에서 검색하면 undefined를 반환해야 합니다', () => {
+        const product = findProductById([], 'p1')
+        expect(product).toBeUndefined()
+      })
+
+      test('모든 mockProducts의 상품을 찾을 수 있어야 합니다', () => {
+        mockProducts.forEach((mockProduct) => {
+          const found = findProductById(mockProducts, mockProduct.id)
+          expect(found).toEqual(mockProduct)
+        })
+      })
+    })
+
+    describe('toggleSetItem >', () => {
+      test('Set에 없는 상품 ID를 추가해야 합니다', () => {
+        const initialSet = new Set<string>([mockProducts[0].id, mockProducts[1].id])
+        const newSet = toggleSetItem(initialSet, mockProducts[2].id)
+
+        expect(newSet.has(mockProducts[2].id)).toBe(true)
+        expect(newSet.size).toBe(3)
+      })
+
+      test('Set에 있는 상품 ID를 제거해야 합니다', () => {
+        const initialSet = new Set<string>(mockProducts.map((p) => p.id))
+        const newSet = toggleSetItem(initialSet, mockProducts[1].id)
+
+        expect(newSet.has(mockProducts[1].id)).toBe(false)
+        expect(newSet.size).toBe(2)
+      })
+
+      test('원본 Set이 변경되지 않아야 합니다', () => {
+        const initialSet = new Set<string>([mockProducts[0].id, mockProducts[1].id])
+        const originalSize = initialSet.size
+
+        toggleSetItem(initialSet, mockProducts[2].id)
+
+        expect(initialSet.size).toBe(originalSize)
+        expect(initialSet.has(mockProducts[2].id)).toBe(false)
+      })
+
+      test('빈 Set에도 정상 동작해야 합니다', () => {
+        const emptySet = new Set<string>()
+        const newSet = toggleSetItem(emptySet, mockProducts[0].id)
+
+        expect(newSet.has(mockProducts[0].id)).toBe(true)
+        expect(newSet.size).toBe(1)
       })
     })
   })
