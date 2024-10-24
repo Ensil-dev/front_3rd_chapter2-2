@@ -1,11 +1,15 @@
 // useCart.ts
-import { useState } from 'react'
+import { useLocalStorage } from './useLocalStorage'
 import { CartItem, Coupon, Product } from '../../types'
 import { calculateCartTotal, updateCartItemQuantity } from './utils/cartUtils'
 
 export const useCart = () => {
-  const [cart, setCart] = useState<CartItem[]>([])
-  const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null)
+  // localStorage에 cart와 selectedCoupon 상태 저장
+  const [cart, setCart] = useLocalStorage<CartItem[]>('shopping-cart', [])
+  const [selectedCoupon, setSelectedCoupon] = useLocalStorage<Coupon | null>(
+    'selected-coupon',
+    null
+  )
 
   const addToCart = (product: Product) => {
     const getRemainingStock = (product: Product) => {
@@ -56,6 +60,12 @@ export const useCart = () => {
     }
   }
 
+  // 장바구니 전체 초기화를 위한 함수 추가
+  const clearCart = () => {
+    setCart([])
+    setSelectedCoupon(null)
+  }
+
   return {
     cart,
     addToCart,
@@ -64,5 +74,6 @@ export const useCart = () => {
     applyCoupon,
     calculateTotal,
     selectedCoupon,
+    clearCart, // 초기화 함수 추가
   }
 }

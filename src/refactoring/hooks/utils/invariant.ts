@@ -5,9 +5,6 @@ export default function invariant(
   condition: any,
   message?: string | (() => string),
 ): asserts condition {
-    console.log(`import.meta.env.PROD: ${import.meta.env.PROD}`)
-    console.log(`import.meta.env.DEV: ${import.meta.env.DEV}`)
-    console.log(isProduction)
   if (condition) {
     return
   }
