@@ -11,6 +11,8 @@ import {
   toggleSetItem,
   validateDiscount,
 } from '../../refactoring/hooks/utils/adminUtils'
+import { useCouponManagement } from '../../refactoring/hooks/useCouponManagement'
+import { INITIAL_COUPON_STATE } from '../../refactoring/constants/admin'
 
 const mockProducts: Product[] = [
   {
@@ -303,6 +305,108 @@ describe('advanced > ', () => {
 
         expect(result.current[0]).toBe('initial') // 초기값으로 리셋
         expect(localStorageMock.removeItem).toHaveBeenCalledWith('test-key')
+      })
+    })
+
+    describe('useCouponManagement >', () => {
+      
+      test('초기 상태는 INITIAL_COUPON_STATE와 같아야 합니다', () => {
+        const onCouponAdd = vi.fn()
+        const { result } = renderHook(() => useCouponManagement(onCouponAdd))
+
+        expect(result.current.newCoupon).toEqual(INITIAL_COUPON_STATE)
+      })
+
+      test('setNewCoupon으로 쿠폰 정보를 업데이트할 수 있어야 합니다', () => {
+        const onCouponAdd = vi.fn()
+        const { result } = renderHook(() => useCouponManagement(onCouponAdd))
+
+        act(() => {
+          result.current.setNewCoupon(mockCoupons[0])
+        })
+
+        expect(result.current.newCoupon).toEqual(mockCoupons[0])
+      })
+
+      test('handleAddCoupon 호출 시 onCouponAdd가 호출되어야 합니다', () => {
+        const onCouponAdd = vi.fn()
+        const { result } = renderHook(() => useCouponManagement(onCouponAdd))
+
+        // 먼저 쿠폰 정보 설정
+        act(() => {
+          result.current.setNewCoupon(mockCoupons[0])
+        })
+
+        // 설정된 값 확인
+        expect(result.current.newCoupon).toEqual(mockCoupons[0])
+
+        // 그 다음 쿠폰 추가
+        act(() => {
+          result.current.handleAddCoupon()
+        })
+
+        expect(onCouponAdd).toHaveBeenCalledWith(mockCoupons[0])
+      })
+
+      test('handleAddCoupon 호출 후 newCoupon이 초기화되어야 합니다', () => {
+        const onCouponAdd = vi.fn()
+        const { result } = renderHook(() => useCouponManagement(onCouponAdd))
+
+        act(() => {
+          result.current.setNewCoupon(mockCoupons[0])
+        })
+
+        act(() => {
+          result.current.handleAddCoupon()
+        })
+
+        expect(result.current.newCoupon).toEqual(INITIAL_COUPON_STATE)
+      })
+
+      test('여러 쿠폰을 순차적으로 추가할 수 있어야 합니다', () => {
+        const onCouponAdd = vi.fn()
+        const { result } = renderHook(() => useCouponManagement(onCouponAdd))
+
+        // 첫 번째 쿠폰 설정 및 추가
+        act(() => {
+          result.current.setNewCoupon(mockCoupons[0])
+        })
+
+        act(() => {
+          result.current.handleAddCoupon()
+        })
+
+        expect(onCouponAdd).toHaveBeenCalledWith(mockCoupons[0])
+        expect(result.current.newCoupon).toEqual(INITIAL_COUPON_STATE)
+
+        // 두 번째 쿠폰 설정 및 추가
+        act(() => {
+          result.current.setNewCoupon(mockCoupons[1])
+        })
+
+        act(() => {
+          result.current.handleAddCoupon()
+        })
+
+        expect(onCouponAdd).toHaveBeenCalledWith(mockCoupons[1])
+        expect(onCouponAdd).toHaveBeenCalledTimes(2)
+      })
+
+      test('빈 쿠폰 정보로 초기화할 수 있어야 합니다', () => {
+        const onCouponAdd = vi.fn()
+        const { result } = renderHook(() => useCouponManagement(onCouponAdd))
+
+        act(() => {
+          result.current.setNewCoupon(mockCoupons[0])
+        })
+
+        expect(result.current.newCoupon).toEqual(mockCoupons[0])
+
+        act(() => {
+          result.current.setNewCoupon(INITIAL_COUPON_STATE)
+        })
+
+        expect(result.current.newCoupon).toEqual(INITIAL_COUPON_STATE)
       })
     })
   })
