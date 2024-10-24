@@ -7,6 +7,7 @@ import {
   INITIAL_COUPON_STATE,
   INITIAL_DISCOUNT_STATE,
 } from '../constants/admin'
+import { findProductById, toggleSetItem, validateDiscount } from '../hooks/utils/adminUtils.ts'
 
 interface Props {
   products: Product[]
@@ -31,15 +32,7 @@ export const AdminPage = ({
   const [showNewProductForm, setShowNewProductForm] = useState(false)
 
   const toggleProductAccordion = (productId: string) => {
-    setOpenProductIds((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.has(productId)) {
-        newSet.delete(productId)
-      } else {
-        newSet.add(productId)
-      }
-      return newSet
-    })
+    setOpenProductIds((prev) => toggleSetItem(prev, productId))
   }
 
   // handleEditProduct 함수 수정
@@ -72,7 +65,7 @@ export const AdminPage = ({
   }
 
   const handleStockUpdate = (productId: string, newStock: number) => {
-    const updatedProduct = products.find((p) => p.id === productId)
+    const updatedProduct = findProductById(products, productId)
     if (updatedProduct) {
       const newProduct = { ...updatedProduct, stock: newStock }
       onProductUpdate(newProduct)
@@ -83,6 +76,12 @@ export const AdminPage = ({
   const handleAddDiscount = (productId: string) => {
     const updatedProduct = products.find((p) => p.id === productId)
     if (updatedProduct && editingProduct) {
+      // 👉 여기에 validateDiscount 추가
+      if (!validateDiscount(newDiscount)) {
+        alert('유효하지 않은 할인 정보입니다.')
+        return
+      }
+
       const newProduct = {
         ...updatedProduct,
         discounts: [...updatedProduct.discounts, newDiscount],
@@ -94,7 +93,7 @@ export const AdminPage = ({
   }
 
   const handleRemoveDiscount = (productId: string, index: number) => {
-    const updatedProduct = products.find((p) => p.id === productId)
+    const updatedProduct = findProductById(products, productId)
     if (updatedProduct) {
       const newProduct = {
         ...updatedProduct,
