@@ -114,20 +114,17 @@ export const useProductManagement = ({
   }, [])
 
   return {
-    // 상태
     editingProduct,
     newDiscount,
     openProductIds,
     newProduct,
     showNewProductForm,
 
-    // 상태 설정 함수
     setEditingProduct,
     setNewDiscount,
     setNewProduct,
     setShowNewProductForm,
 
-    // 핸들러 함수들
     handleEditProduct,
     handleProductNameUpdate,
     handleEditComplete,

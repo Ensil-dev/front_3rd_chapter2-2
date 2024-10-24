@@ -6,9 +6,7 @@ export const useProducts = (initialProducts: Product[]) => {
 
   const updateProduct = (updatedProduct: Product) => {
     setProducts((prevProducts) =>
-      prevProducts.map((p) =>
-        p.id === updatedProduct.id ? updatedProduct : p,
-      ),
+      prevProducts.map((p) => (p.id === updatedProduct.id ? updatedProduct : p)),
     )
   }
 
