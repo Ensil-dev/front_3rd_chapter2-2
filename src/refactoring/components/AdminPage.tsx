@@ -2,9 +2,10 @@ import { useCallback, useState } from 'react'
 import { Coupon, Product } from '../../types.ts'
 import { ProductManagement } from './admin/ProductManagement.tsx'
 import { CouponManagement } from './admin/CouponManagement.tsx'
-import { INITIAL_PRODUCT_STATE, INITIAL_COUPON_STATE } from '../constants/admin'
+import { INITIAL_PRODUCT_STATE } from '../constants/admin'
 import { toggleSetItem } from '../hooks/utils/adminUtils.ts'
 import { useProductManagement } from '../hooks/useProductManagement.ts'
+import { useCouponManagement } from '../hooks/useCouponManagement.ts'
 
 interface Props {
   products: Product[]
@@ -22,7 +23,6 @@ export const AdminPage = ({
   onCouponAdd,
 }: Props) => {
   const [openProductIds, setOpenProductIds] = useState<Set<string>>(new Set())
-  const [newCoupon, setNewCoupon] = useState<Coupon>(INITIAL_COUPON_STATE)
   const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>(INITIAL_PRODUCT_STATE)
   const [showNewProductForm, setShowNewProductForm] = useState(false)
 
@@ -39,15 +39,7 @@ export const AdminPage = ({
     handleRemoveDiscount,
   } = useProductManagement(onProductUpdate)
 
-  const handleAddCoupon = () => {
-    onCouponAdd(newCoupon)
-    setNewCoupon({
-      name: '',
-      code: '',
-      discountType: 'percentage',
-      discountValue: 0,
-    })
-  }
+  const { newCoupon, setNewCoupon, handleAddCoupon } = useCouponManagement(onCouponAdd)
 
   const toggleProductAccordion = useCallback((productId: string) => {
     setOpenProductIds((prev) => toggleSetItem(prev, productId))
