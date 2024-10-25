@@ -1,6 +1,6 @@
 import { Coupon, Product } from '../../types.ts'
-import { ProductManagement } from './admin/ProductManagement.tsx'
-import { CouponManagement } from './admin/CouponManagement.tsx'
+import { ProductManagement } from './admin/product/ProductManagement.tsx'
+import { CouponManagement } from './admin/coupon/CouponManagement.tsx'
 import { useProductManagement } from '../hooks/useProductManagement.ts'
 import { useCouponManagement } from '../hooks/useCouponManagement.ts'
 
