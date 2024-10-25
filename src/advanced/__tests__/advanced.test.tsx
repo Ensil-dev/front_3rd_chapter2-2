@@ -5,15 +5,13 @@ import { CartPage } from '../../refactoring/components/CartPage'
 import { AdminPage } from '../../refactoring/components/AdminPage'
 import { Coupon, Discount, Product } from '../../types'
 import { useLocalStorage } from '../../refactoring/hooks'
-import invariant from '../../refactoring/hooks/utils/invariant'
-import {
-  findProductById,
-  toggleSetItem,
-  validateDiscount,
-} from '../../refactoring/hooks/utils/adminUtils'
+
 import { useCouponManagement } from '../../refactoring/hooks/useCouponManagement'
 import { INITIAL_COUPON_STATE, INITIAL_PRODUCT_STATE } from '../../refactoring/constants/admin'
 import { useProductManagement } from '../../refactoring/hooks/useProductManagement'
+import invariant, { toggleSetItem } from '../../refactoring/hooks/utils/common'
+import { validateDiscount } from '../../refactoring/hooks/utils/discount'
+import { findProductById } from '../../refactoring/hooks/utils/product'
 
 const mockProducts: Product[] = [
   {

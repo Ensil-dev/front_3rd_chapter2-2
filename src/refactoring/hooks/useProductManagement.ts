@@ -1,7 +1,9 @@
 import { useCallback, useState } from 'react'
 import { Discount, Product } from '../../types'
 import { INITIAL_DISCOUNT_STATE, INITIAL_PRODUCT_STATE } from '../constants/admin'
-import { findProductById, validateDiscount, toggleSetItem } from './utils/adminUtils'
+import { findProductById } from './utils/product'
+import { validateDiscount } from './utils/discount'
+import { toggleSetItem } from './utils/common'
 
 interface UseProductManagementProps {
   onProductUpdate: (product: Product) => void

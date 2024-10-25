@@ -1,10 +1,20 @@
-const isProduction: boolean = import.meta.env.PROD === true
-const prefix: string = 'Invariant failed'
+export const toggleSetItem = (set: Set<string>, itemId: string): Set<string> => {
+  const newSet = new Set(set)
+  if (newSet.has(itemId)) {
+    newSet.delete(itemId)
+  } else {
+    newSet.add(itemId)
+  }
+  return newSet
+}
 
 export default function invariant(
   condition: any,
   message?: string | (() => string),
 ): asserts condition {
+  const isProduction: boolean = import.meta.env.PROD === true
+  const prefix: string = 'Invariant failed'
+
   if (condition) {
     return
   }

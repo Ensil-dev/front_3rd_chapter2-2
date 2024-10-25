@@ -1,7 +1,8 @@
 // useCart.ts
 import { useLocalStorage } from './useLocalStorage'
 import { CartItem, Coupon, Product } from '../../types'
-import { calculateCartTotal, updateCartItemQuantity } from './utils/cartUtils'
+import { updateCartItemQuantity } from './utils/cartItem'
+import { calculateCartTotal } from './utils/services/cartCalculationService'
 
 export const useCart = () => {
   const [cart, setCart] = useLocalStorage<CartItem[]>('shopping-cart', [])

@@ -1,6 +1,6 @@
 import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, Key } from "react"
 import { Product } from "../../../types"
-import { getMaxDiscount } from "../../hooks/utils/cartUtils"
+import { getMaxDiscount } from "../../hooks/utils/discount"
 
 interface Props {
     product: Product

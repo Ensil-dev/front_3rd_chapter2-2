@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 import { Coupon, Product } from '../../types.ts'
 import { useCart } from '../hooks'
-import invariant from '../hooks/utils/invariant.ts'
 import { CartDetail } from './carts/CartDetail.tsx'
 import { ProductList } from './carts/ProductList.tsx'
+import invariant from '../hooks/utils/common/index.ts'
 
 interface Props {
   products: Product[]
